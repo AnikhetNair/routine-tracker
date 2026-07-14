@@ -1,67 +1,49 @@
-import path from 'path';
-import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
+import path from "path";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
 
-const rawPort = process.env.PORT ?? '3000';
-
+const rawPort = process.env.PORT ?? "3000";
 const port = Number(rawPort);
 
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH ?? '/';
-
 export default defineConfig({
-  base: basePath,
   plugins: [
     react(),
     tailwindcss(),
-    ...(process.env.NODE_ENV !== 'production' &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import('@replit/vite-plugin-cartographer').then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, '..'),
-            }),
-          ),
-          await import('@replit/vite-plugin-dev-banner').then((m) =>
-            m.devBanner(),
-          ),
-        ]
-      : []),
   ],
+
   resolve: {
     alias: {
-      '@': path.resolve(import.meta.dirname, 'src'),
-      '@workspace/api-client-react': path.resolve(import.meta.dirname, 'src/lib/api-client-mock.ts'),
-      '@assets': path.resolve(
-        import.meta.dirname,
-        '..',
-        '..',
-        'attached_assets',
+      "@": path.resolve(__dirname, "src"),
+      "@workspace/api-client-react": path.resolve(
+        __dirname,
+        "src/lib/api-client-mock.ts"
       ),
+      "@assets": path.resolve(__dirname, "../../attached_assets"),
     },
-    dedupe: ['react', 'react-dom'],
+    dedupe: ["react", "react-dom"],
   },
-  root: path.resolve(import.meta.dirname),
+
+  root: __dirname,
+
   build: {
-    outDir: path.resolve(import.meta.dirname, 'dist/public'),
+    outDir: "dist",
     emptyOutDir: true,
+    chunkSizeWarningLimit: 1000,
   },
+
   server: {
     port,
     strictPort: true,
-    host: '0.0.0.0',
-    allowedHosts: true,
-    fs: {
-      strict: true,
-    },
+    host: true,
   },
+
   preview: {
     port,
-    host: '0.0.0.0',
-    allowedHosts: true,
+    host: true,
   },
 });
